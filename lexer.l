@@ -21,6 +21,9 @@
 "print"                 printf("PRINT ");
 "read"                  printf("READ ");
 "cond"                  printf("COND ");
+"cons"                  printf("CONS ");
+"rest"                  printf("REST ");
+"first"                 printf("FIRST ");
 \"(\\.|[^\\"])*\"       /*yylval = yytext[0] - 'a';*/ printf("STRING ");
 [0-9]+                  /*yylval = atoi(yytext);*/ printf("NUMBER ");
 [a-zA-Z]+([0-9a-zA-Z])* /*yylval = yytext[0] - 'a';*/ printf("ATOM ");
