@@ -1,37 +1,67 @@
 %{
+#include "parser.tab.h"
+#include <stdlib.h>
 #include <stdio.h>
 %}
 
-%%
-";;".*                  printf("COMMENT ");
-"=="                    printf("EQEQ ");
-"!="                    printf("NE ");
-"<"                     printf("LT ");
-"<="                    printf("LE ");
-">"                     printf("GT ");
-">="                    printf("GE ");
-"+"                     printf("PLUS ");
-"-"                     printf("MINUS ");
-"*"                     printf("MULT ");
-"/"                     printf("DIVIDE ");
-")"                     printf("RPAREN ");
-"("                     printf("LPAREN ");
-"define"                printf("DEFINE ");
-"let"                   printf("LET ");
-"print"                 printf("PRINT ");
-"read"                  printf("READ ");
-"cond"                  printf("COND ");
-"cons"                  printf("CONS ");
-"rest"                  printf("REST ");
-"first"                 printf("FIRST ");
-\"(\\.|[^\\"])*\"       /*yylval = yytext[0] - 'a';*/ printf("STRING ");
-[0-9]+                  /*yylval = atoi(yytext);*/ printf("NUMBER ");
-[a-zA-Z]+([0-9a-zA-Z])* /*yylval = yytext[0] - 'a';*/ printf("ATOM ");
-[ ]                     printf("WHITESPACE ");
-[\t\n\r]                printf("IGNORE ");
-.                       printf("ERROR ");
-%%
+COMMENT ";;".*
+EQEQ "=="
+NE "!="
+LT "<"
+LE "<="
+GT ">"
+GE ">="
+PLUS "+"
+MINUS "-"
+MULT "*"
+DIVIDE "/"
+RPAREN ")"
+LPAREN "("
+DEFINE "define"
+LET "let"
+PRINT "print"
+READ "read"
+COND "cond"
+CONS "cons"
+REST "rest"
+FIRST "first"
+EMPTY "empty"
+STRING \"(\\.|[^\\"])*\"
+INT [0-9]+
+ATOM [a-zA-Z]+([0-9a-zA-Z])*
+WHITESPACE [ ]
+IGNORE [\t\n\r]
+ERROR .
 
-#ifndef yywrap
-yywrap() { return 1; }
-#endif
+%%
+[\t]
+
+{COMMENT} { }
+{EQEQ} { return (EQEQ); }
+{NE} { return (NE); }
+{LT} { return (LT); }
+{LE} { return (LE); }
+{GT} { return (GT); }
+{GE} { return (GE); }
+{PLUS} { return (PLUS); }
+{MINUS} { return (MINUS); }
+{MULT} { return (MULT); }
+{DIVIDE} { return (DIVIDE); }
+{RPAREN} { return (RPAREN); }
+{LPAREN} { return (LPAREN); }
+{DEFINE} { return (DEFINE); }
+{LET} { return (LET); }
+{PRINT} { return (PRINT); }
+{READ} { return (READ); }
+{COND} { return (COND); }
+{CONS} { return (CONS); }
+{REST} { return (REST); }
+{FIRST} { return (FIRST); }
+{EMPTY} { return (EMPTY); }
+{STRING} { yylval.sval = strdup(yytext); return (STRING); }
+{INT} { yylval.ival = atoi(yytext); return (INT); }
+{ATOM} { yylval.sindex = *yytext - 'a'; return (ATOM); }
+{WHITESPACE} { return (WHITESPACE); }
+{IGNORE} { return (IGNORE); }
+{ERROR} { return (ERROR); }
+%%
