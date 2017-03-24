@@ -919,13 +919,13 @@ YY_RULE_SETUP
 case 27:
 YY_RULE_SETUP
 #line 64 "lexer.l"
-{ return (WHITESPACE); }
+{ }
 	YY_BREAK
 case 28:
 /* rule 28 can match eol */
 YY_RULE_SETUP
 #line 65 "lexer.l"
-{ return (IGNORE); }
+{ }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
@@ -934,7 +934,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 67 "lexer.l"
+#line 68 "lexer.l"
 ECHO;
 	YY_BREAK
 #line 941 "lex.yy.c"
@@ -1935,7 +1935,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 67 "lexer.l"
+#line 68 "lexer.l"
 
 
 

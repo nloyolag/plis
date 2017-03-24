@@ -61,7 +61,8 @@ ERROR .
 {STRING} { yylval.sval = strdup(yytext); return (STRING); }
 {INT} { yylval.ival = atoi(yytext); return (INT); }
 {ATOM} { yylval.sindex = *yytext - 'a'; return (ATOM); }
-{WHITESPACE} { return (WHITESPACE); }
-{IGNORE} { return (IGNORE); }
+{WHITESPACE} { }
+{IGNORE} { }
 {ERROR} { return (ERROR); }
+
 %%
