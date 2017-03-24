@@ -13,7 +13,7 @@ COMMENT
 3. A small program with variable definition.
 =============================================
 
-(let (x 15))
+(let x 15)
 LPAREN LET WHITESPACE LPAREN ATOM WHITESPACE NUMBER RPAREN RPAREN
 
 4. A small program with constant definition.
@@ -40,7 +40,7 @@ STRING WHITESPACE NUMBER WHITESPACE ATOM
 (define (sum x)
     (cond
         ((== X 0) 0)
-        (+ (sum (- x 1)) 1)
+        ((!= X 0) 1)
     )
 )
 LPAREN DEFINE WHITESPACE LPAREN ATOM WHITESPACE ATOM RPAREN

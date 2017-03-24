@@ -72,7 +72,8 @@ extern int yydebug;
     ERROR = 282,
     INT = 283,
     STRING = 284,
-    ATOM = 285
+    CONSTANT = 285,
+    ATOM = 286
   };
 #endif
 
@@ -87,7 +88,7 @@ union YYSTYPE
 	char *sval;
     char sindex;
 
-#line 91 "parser.tab.h" /* yacc.c:1909  */
+#line 92 "parser.tab.h" /* yacc.c:1909  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1

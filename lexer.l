@@ -28,6 +28,7 @@ FIRST "first"
 EMPTY "empty"
 STRING \"(\\.|[^\\"])*\"
 INT [0-9]+
+CONSTANT [A-Z]+([0-9A-Z])*
 ATOM [a-zA-Z]+([0-9a-zA-Z])*
 WHITESPACE [ ]
 IGNORE [\t\n\r]
@@ -60,6 +61,7 @@ ERROR .
 {EMPTY} { return (EMPTY); }
 {STRING} { yylval.sval = strdup(yytext); return (STRING); }
 {INT} { yylval.ival = atoi(yytext); return (INT); }
+{CONSTANT} { yylval.sindex = *yytext - 'a'; return (CONSTANT); }
 {ATOM} { yylval.sindex = *yytext - 'a'; return (ATOM); }
 {WHITESPACE} { }
 {IGNORE} { }
