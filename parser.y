@@ -13,10 +13,18 @@ void yyerror(const char *s) {
 }
 %}
 
+%code requires {
+    typedef struct item {
+        struct item* next;
+        int value;
+    } Item;
+}
+
 %union {
 	int ival;
 	char *sval;
     char sindex;
+    Item* Item;
 }
 
 %token COMMENT
@@ -50,7 +58,10 @@ void yyerror(const char *s) {
 %token <sindex> CONSTANT
 %token <sindex> ATOM
 
-%type<ival> expr atom list items def bool_expr program main statement print read arith_expr cond_expr cond_opts bool_expr_cond
+%type<Item> items
+%type<ival> atom list def program main statement print read
+%type<ival> expr bool_expr arith_expr cond_expr cond_opts bool_expr_cond
+%type<ival> list_expr
 
 %start program
 
@@ -60,10 +71,6 @@ void yyerror(const char *s) {
 // Lists
 //   - first
 //   - rest
-//   - cons
-//   - empty
-// Conditionals
-//   - cond
 // Strings
 //   - def block
 //   - print string
@@ -97,23 +104,34 @@ expr: atom
       | bool_expr
       | arith_expr
       | cond_expr
+      | list_expr
       ;
 
-bool_expr: LPAREN GE atom atom RPAREN {$$ = ($3>=$4); ($3>=$4) ? printf("true\n") : printf("false\n");}
-           | LPAREN GT atom atom RPAREN {$$ = ($3>$4); ($3>$4) ? printf("true\n") : printf("false\n");}
-           | LPAREN LE atom atom RPAREN {$$ = ($3<=$4); ($3<=$4) ? printf("true\n") : printf("false\n");}
-           | LPAREN LT atom atom RPAREN {$$ = ($3<$4); ($3<$4) ? printf("true\n") : printf("false\n");}
-           | LPAREN NE atom atom RPAREN {$$ = ($3!=$4); ($3!=$4) ? printf("true\n") : printf("false\n");}
-           | LPAREN EQEQ atom atom RPAREN {$$ = ($3==$4); ($3==$4) ? printf("true\n") : printf("false\n");}
+bool_expr: LPAREN GE atom atom RPAREN {$$ = ($3>=$4);
+                                       ($3>=$4) ? printf("true\n") : printf("false\n");}
+           | LPAREN GT atom atom RPAREN {$$ = ($3>$4);
+                                         ($3>$4) ? printf("true\n") : printf("false\n");}
+           | LPAREN LE atom atom RPAREN {$$ = ($3<=$4);
+                                         ($3<=$4) ? printf("true\n") : printf("false\n");}
+           | LPAREN LT atom atom RPAREN {$$ = ($3<$4);
+                                         ($3<$4) ? printf("true\n") : printf("false\n");}
+           | LPAREN NE atom atom RPAREN {$$ = ($3!=$4);
+                                         ($3!=$4) ? printf("true\n") : printf("false\n");}
+           | LPAREN EQEQ atom atom RPAREN {$$ = ($3==$4);
+                                           ($3==$4) ? printf("true\n") : printf("false\n");}
            ;
 
-arith_expr: LPAREN PLUS atom atom RPAREN {$$ = $3 + $4; printf("%d\n", $3 + $4);}
-            | LPAREN MINUS atom atom RPAREN {$$ = $3 - $4; printf("%d\n", $3 - $4);}
-            | LPAREN MULT atom atom RPAREN {$$ = $3 * $4; printf("%d\n", $3 * $4);}
-            | LPAREN DIVIDE atom atom RPAREN {$$ = $3 / $4; printf("%d\n", $3 / $4);}
+arith_expr: LPAREN PLUS atom atom RPAREN {$$ = $3 + $4;
+                                          printf("%d\n", $3 + $4);}
+            | LPAREN MINUS atom atom RPAREN {$$ = $3 - $4;
+                                             printf("%d\n", $3 - $4);}
+            | LPAREN MULT atom atom RPAREN {$$ = $3 * $4;
+                                            printf("%d\n", $3 * $4);}
+            | LPAREN DIVIDE atom atom RPAREN {$$ = $3 / $4;
+                                              printf("%d\n", $3 / $4);}
             ;
 
-cond_expr: LPAREN COND cond_opts RPAREN
+cond_expr: LPAREN COND cond_opts RPAREN {}
            ;
 
 cond_opts: LPAREN bool_expr_cond atom RPAREN {if($2){printf("%d", $3);}}
@@ -128,20 +146,30 @@ bool_expr_cond: LPAREN GE atom atom RPAREN {$$ = ($3>=$4);}
                 | LPAREN EQEQ atom atom RPAREN {$$ = ($3==$4);}
                 ;
 
-list: LPAREN items RPAREN
-      | LPAREN RPAREN
+list_expr: LPAREN REST items RPAREN {Item * ptr = $3->next;
+                                    $$ = (Item *) $3->next;
+                                    printf("| REST: ");
+                                    while (ptr != NULL) {
+                                        printf("%d, ", ptr->value);
+                                        ptr = ptr->next;
+                                    }}
+           | LPAREN FIRST items RPAREN {$$ = $3->value;
+                                      printf("| FIRST: %d", $3->value);}
+
+list: items {printf(" <- List");}
       ;
 
-items: expr
-       | expr items
+items: LPAREN CONS atom items RPAREN {$$ = malloc(sizeof(struct item));
+                                      $$->next = $4;
+                                      $$->value = $3;
+                                      printf("%d, ", $3);}
+       | LPAREN CONS atom EMPTY RPAREN {$$ = malloc(sizeof(struct item));
+                                        $$->next = NULL;
+                                        $$->value = $3;
+                                        printf("%d, ", $3);}
        ;
 
-atom: //EMPTY
-      //| FIRST
-      //| REST
-      //| CONS
-      //| COND
-      //| STRING {$$=$1;}
+atom: //| STRING {$$=$1;}
       INT {$$=$1;}
       | ATOM {$$=sym[$1];}
       | CONSTANT {$$=sym[$1];}
