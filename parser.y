@@ -59,7 +59,7 @@ void yyerror(const char *s) {
 %token <sindex> ATOM
 
 %type<Item> items
-%type<ival> atom list def program main statement print read
+%type<ival> atom list def program main statement print read string
 %type<ival> expr bool_expr arith_expr cond_expr cond_opts bool_expr_cond
 %type<ival> list_expr
 
@@ -67,22 +67,14 @@ void yyerror(const char *s) {
 
 %%
 
-// TODO
-// Lists
-//   - first
-//   - rest
-// Strings
-//   - def block
-//   - print string
-
 program: main
          | program main
          ;
 
 main: expr
-         | def
-         | statement
-         ;
+      | def
+      | statement
+      ;
 
 def: LPAREN DEFINE CONSTANT INT RPAREN {sym[$3] = $4;}
      | LPAREN LET ATOM INT RPAREN {sym[$3] = $4;}
@@ -93,13 +85,14 @@ statement: print
            ;
 
 print: LPAREN PRINT atom RPAREN {printf("%d", $3);}
-       //| LPAREN PRINT STRING RPAREN {printf("%s", $3);}
+       | LPAREN PRINT STRING RPAREN {printf("%s", $3);}
        ;
 
 read: LPAREN READ ATOM RPAREN {scanf("%d", &sym[$3]);}
       ;
 
 expr: atom
+      | string
       | list
       | bool_expr
       | arith_expr
@@ -154,7 +147,7 @@ list_expr: LPAREN REST items RPAREN {Item * ptr = $3->next;
                                         ptr = ptr->next;
                                     }}
            | LPAREN FIRST items RPAREN {$$ = $3->value;
-                                      printf("| FIRST: %d", $3->value);}
+                                       printf("| FIRST: %d", $3->value);}
 
 list: items {printf(" <- List");}
       ;
@@ -169,11 +162,12 @@ items: LPAREN CONS atom items RPAREN {$$ = malloc(sizeof(struct item));
                                         printf("%d, ", $3);}
        ;
 
-atom: //| STRING {$$=$1;}
-      INT {$$=$1;}
+atom: INT {$$=$1;}
       | ATOM {$$=sym[$1];}
       | CONSTANT {$$=sym[$1];}
       ;
+
+string: STRING {$$=$1;};
 
 %%
 
